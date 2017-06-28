@@ -3,10 +3,10 @@ REM ======================================================================
 REM
 REM NAME: Verify_server.bat 
 REM
-REM AUTHOR  : Dennis Knutsson Webland AB 
-REM AUTHOR  : dennis@webland.se
-REM AUTHOR  : 0701-801966
-REM Created : 2016-09-09
+REM AUTHOR  : Dennis Knutsson Getit AB 
+REM AUTHOR  : dennis.knutsson@getitnordic.se
+REM AUTHOR  : 0761-750351
+REM Created : 2017-06-28
 REM
 REM COMMENT: Check status of servers for costumer
 REM USAGE1: Scriptname only = search for computers in list if list exist else prompt for computername
