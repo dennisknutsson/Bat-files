@@ -54,8 +54,9 @@ IF NOT EXIST Files\*.* MD Files
 IF NOT EXIST "!_NEEDS_attentionfile!" ECHO.>!_NEEDS_attentionfile!
 
 REM Change to settings file
-SET _dnssuffix=plastal.net
-
+REM SET _dnssuffix=plastal.net
+FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "dnssuffix" "settings.cfg"') DO IF %%A==0 (ECHO dnssuffix^=change.me>>settings.cfg)
+FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "dnssuffix" "settings.cfg"') DO (SET _dnssuffix=%%A)
 
 CLS
 IF X%1 NEQ X SET _computer=%1
