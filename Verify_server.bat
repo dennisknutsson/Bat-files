@@ -46,10 +46,10 @@ ECHO !_starttime!
 )
 
 REM Prereq
-IF NOT EXIST ..\Script_software\*.* ECHO ..\Script_software\*.* not found &PAUSE& GOTO EOF
-IF EXIST ..\Script_software\psexec.exe (SET _psexec="..\Script_software\psexec.exe")ELSE (ECHO ..\Script_software\psexec.exe not found &PAUSE& GOTO EOF)
-IF EXIST ..\Script_software\psloggedon.exe (SET _psloggedon="..\Script_software\psloggedon.exe")ELSE (ECHO ..\Script_software\psloggedon.exe not found &PAUSE& GOTO EOF)
-IF EXIST ..\Script_software\pskill.exe (SET _pskill="..\Script_software\pskill.exe")ELSE (ECHO ..\Script_software\pskill.exe not found &PAUSE& GOTO EOF)
+IF NOT EXIST ..\SysinternalsSuite\*.* ECHO ..\SysinternalsSuite\*.* not found &PAUSE& GOTO EOF
+IF EXIST ..\SysinternalsSuite\psexec.exe (SET _psexec="..\SysinternalsSuite\psexec.exe")ELSE (ECHO ..\SysinternalsSuite\psexec.exe not found &PAUSE& GOTO EOF)
+IF EXIST ..\SysinternalsSuite\psloggedon.exe (SET _psloggedon="..\SysinternalsSuite\psloggedon.exe")ELSE (ECHO ..\SysinternalsSuite\psloggedon.exe not found &PAUSE& GOTO EOF)
+IF EXIST ..\SysinternalsSuite\pskill.exe (SET _pskill="..\SysinternalsSuite\pskill.exe")ELSE (ECHO ..\SysinternalsSuite\pskill.exe not found &PAUSE& GOTO EOF)
 IF NOT EXIST Files\*.* MD Files
 IF NOT EXIST "!_NEEDS_attentionfile!" ECHO.>!_NEEDS_attentionfile!
 
@@ -69,7 +69,7 @@ SET _separator=***** Count *****************************************************
 REM ECHO !_separator:~0,70!
 ECHO        ^<tr bgcolor="6495ED"^> >!_legend!
 REM Check for odd/even
-IF NOT EXIST "%~dp0file.txt" (ECHO       ^<tr bgcolor="ffffff"^> >>!_table!) ELSE (ECHO       ^<tr bgcolor="dddddd"^> >>!_table!)
+IF NOT EXIST "%~dp0file.txt" (ECHO        ^<tr bgcolor="ffffff"^> >>!_table!) ELSE (ECHO        ^<tr bgcolor="dddddd"^> >>!_table!)
 IF NOT EXIST "%~dp0file.txt" (ECHO.>"%~dp0file.txt") ELSE (DEL /Q "%~dp0file.txt")
 REM ECHO        ^<tr^> >>!_table!
 ECHO         ^<td width="50"^>^<div align="center"^>Count^</div^>^</td^> >>!_legend!
@@ -690,11 +690,11 @@ ECHO     font-weight: bold;>>!_topname!
 ECHO     font-size:20px;>>!_topname!
 ECHO }>>!_topname!
 
-REM TABLE {border-width: 1px;border-style: solid;border-color: black;border-collapse: collapse;}
-REM TH {border-width: 1px;padding: 3px;border-style: solid;border-color: black;background-color: #6495ED;}
-REM TD {border-width: 1px;padding: 3px;border-style: solid;border-color: black;}
-REM .odd  { background-color:#ffffff; }
-REM .even { background-color:#dddddd; }
+ECHO TABLE {border-width: 1px;border-style: solid;border-color: black;border-collapse: collapse;}>>!_topname!
+ECHO TH {border-width: 1px;padding: 3px;border-style: solid;border-color: black;background-color: #6495ED;}>>!_topname!
+ECHO TD {border-width: 1px;padding: 3px;border-style: solid;border-color: black;}>>!_topname!
+ECHO .odd  { background-color:#ffffff; }>>!_topname!
+ECHO .even { background-color:#dddddd; }>>!_topname!
 
 ECHO ^</style^>^</head^> >>!_topname!
 ECHO   ^<body background="#ffffff"^> >>!_topname!
@@ -702,12 +702,12 @@ ECHO     ^<table border="1" cellspacing="0"^> >>!_topname!
 ECHO        ^<tr bgcolor="#ffffff"^> >>!_topname!
 IF NOT EXIST "Files\offline.log" ECHO         ^<td colspan="!_colspan!"^>^<div align="center"^>^<a href="Files\online.log"^>Online ^</a^>Computers %title% %_zon%^</div^>^</td^> >>!_topname!
 IF EXIST "Files\offline.log" ECHO         ^<td colspan="!_colspan!"^>^<div align="center"^>^<a href="Files\online.log"^>Online ^</a^>Computers %title% Filetime=%filetime% ^<a href="Files\offline.log"^> Offline^</a^>^</div^>^</td^> >>!_topname!
-ECHO       ^</tr^> >>!_topname!
+ECHO        ^</tr^> >>!_topname!
 ECHO        ^<tr bgcolor="#ffffff"^> >>!_topname!
 ECHO         ^<td colspan="!_colspan!"^>Start !_starttime!^</td^> >>!_topname!
-ECHO       ^</tr^> >>!_topname!
-ECHO       ^</tr^>>>!_legend! 
-ECHO       ^</tr^> >>!_table!
+ECHO        ^</tr^> >>!_topname!
+ECHO        ^</tr^>>>!_legend! 
+ECHO        ^</tr^> >>!_table!
 )
 
 SET _count_online=0
