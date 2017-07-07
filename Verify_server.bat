@@ -3,14 +3,16 @@ REM ======================================================================
 REM
 REM NAME: Verify_server.bat 
 REM
-REM AUTHOR  : Dennis Knutsson Webland AB 
-REM AUTHOR  : dennis@webland.se
-REM AUTHOR  : 0701-801966
-REM Created : 2016-09-09
+REM AUTHOR  : Dennis Knutsson Getit Nordic AB 
+REM AUTHOR  : dennis.knutsson@getitnordic.se
+REM AUTHOR  : 0761750351
+REM Created : 2012-09-09
+REM Updated : 2017-07-04
 REM
 REM COMMENT: Check status of servers for costumer
-REM USAGE1: Scriptname only = search for computers in list if list exist else prompt for computername
-REM USAGE2: Scriptname computername = Checks only computername
+REM USAGE1: Scriptname only =  prompt for computername
+REM USAGE2: Scriptname computername = Checks only computername without asking
+REM Change settings.cfg to fit your needs.
 REM TODO: settings file include user and password for schtask, domain.
 REM ======================================================================
 CLS
@@ -253,10 +255,12 @@ SET /A _colspan+=1
 SET _ados=NA
 FOR /F "tokens=1 delims=" %%A IN ('dsquery * -filter "(&(objectClass=Computer)(objectCategory=Computer)(sAMAccountName=!_computer!$))" -attr operatingSystem^|FIND /I /V "operatingSystem"') DO (SET _ados=%%A)
 REM ECHO ADos=!_ados!
+SET _ados=!_ados:  =!
 ECHO !_computer!>>"Files\!_ados!.log"
 ECHO         ^<td width="250"^> AD_os ^</td^> >>!_legend!
 ECHO         ^<td width="250"^> !_ados! ^</td^> >>!_table!
 ECHO !_ados!
+ECHO !_ados!>>"Files\OS.log"
 SET _separator=***** End ************************************************************
 ECHO !_separator:~0,70!
 ECHO.
@@ -316,8 +320,6 @@ IF !_verify_clock!==yes (
 )
 
 
-
-
 :: check_symantec ; Values yes/no
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_symantec" "settings.cfg"') DO IF %%A==0 (ECHO check_symantec^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_symantec" "settings.cfg"') DO (SET check_symantec=%%A)
@@ -327,7 +329,7 @@ IF !check_symantec!==yes (
 	SET /A _colspan+=1
 	SET _symantec_result=NA
 	SET _result=NA
-	ECHO         ^<td width="100"^>^<div align="center"^>Symantec^<br^>cleaned^</div^>^</td^> >>!_legend!
+	ECHO         ^<td width="100"^>^<div align="center"^>Symantec^<br^>Cleaned^</div^>^</td^> >>!_legend!
 	IF !_mode!==up (
 		IF EXIST "\\!_computer!\c$\*.*" (
 			SET _symantec_result=OK
@@ -354,26 +356,33 @@ IF !check_symantec!==yes (
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_hp" "settings.cfg"') DO IF %%A==0 (ECHO check_hp^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_hp" "settings.cfg"') DO (SET check_hp=%%A)
 IF !check_hp!==yes (
-SET _separator=***** HP ***********************************************************
-ECHO !_separator:~0,70!
-SET /A _colspan+=1
-SET _hp_result=OK
-IF !_mode!==up (
-IF EXIST "\\!_computer!\c$\Program Files\hp\*.*" SET _hp_result=NOK
-IF EXIST "\\!_computer!\c$\hp\*.*" SET _hp_result=NOK
-)
-ECHO !_computer!>>"Files\!_hp_result!.log"
-ECHO         ^<td width="100"^> HP^<br^>cleaned ^</td^> >>!_legend!
-IF !_mode!==up IF "!_hp_result!"=="OK" (ECHO         ^<td width="100"^>^<div align="center"^>!_ok!^</div^>^</td^> >>%_table%) ELSE (ECHO         ^<td width="100"^>^<div align="center"^>!_nok!^</div^>^</td^> >>%_table%) 
-IF !_mode!==down ECHO         ^<td width="100"^>^<div align="center"^> NA ^</div^>^</td^> >>%_table%
-ECHO !_hp_result!
-SET _separator=***** End ************************************************************
-ECHO !_separator:~0,70!
-ECHO.
+	SET _separator=***** HP ***********************************************************
+	ECHO !_separator:~0,70!
+	SET /A _colspan+=1
+	SET _hp_result=NA
+	SET _result=NA
+	ECHO         ^<td width="100"^>^<div align="center"^>HP^<br^>Cleaned^</div^>^</td^> >>!_legend!
+	IF !_mode!==up (
+		IF EXIST "\\!_computer!\c$\*.*" (
+			SET _hp_result=OK
+			IF EXIST "\\!_computer!\c$\Program Files\hp\*.*" SET _hp_result=NOK
+			IF EXIST "\\!_computer!\c$\hp\*.*" SET _hp_result=NOK
+		)
+	)
+	ECHO !_computer!>>"Files\!_hp_result!.log"
+
+	IF "!_hp_result!"=="OK" (SET _result=!_ok!)
+	IF "!_hp_result!"=="NOK" (SET _result=!_nok!)
+	IF !_mode!==down (SET _result=NA)
+	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
+	ECHO !_hp_result!
+	SET _separator=***** End ************************************************************
+	ECHO !_separator:~0,70!
+	ECHO.
 )
 
 :: check_ibm ; Values yes/no
-FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_ibm" "settings.cfg"') DO IF %%A==0 (ECHO check_ibm^=yes>>settings.cfg)
+FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_ibm" "settings.cfg"') DO IF %%A==0 (ECHO check_ibm^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_ibm" "settings.cfg"') DO (SET check_ibm=%%A)
 IF !check_ibm!==yes (
 SET _separator=***** Tivoli ***********************************************************
@@ -381,7 +390,7 @@ SET _separator=***** Tivoli ****************************************************
 	SET /A _colspan+=1
 	SET _ibm_result=NA
 	SET _result=NA
-	ECHO         ^<td width="100"^>^<div align="center"^>IBM^<br^>cleaned^</div^>^</td^> >>!_legend!
+	ECHO         ^<td width="100"^>^<div align="center"^>IBM^<br^>Cleaned^</div^>^</td^> >>!_legend!
 	IF !_mode!==up (
 		IF EXIST "\\!_computer!\c$\*.*" (
 			SET _ibm_result=OK
@@ -414,7 +423,7 @@ SET _separator=***** Tivoli ****************************************************
 	SET /A _colspan+=1
 	SET _tivoli_result=NA
 	SET _result=NA
-	ECHO         ^<td width="100"^>^<div align="center"^>Tivoli^<br^>cleaned^</div^>^</td^> >>!_legend!
+	ECHO         ^<td width="100"^>^<div align="center"^>Tivoli^<br^>Cleaned^</div^>^</td^> >>!_legend!
 	IF !_mode!==up (
 		IF EXIST "\\!_computer!\c$\*.*" (
 			SET _tivoli_result=OK
@@ -442,7 +451,7 @@ IF !check_op5!==yes (
 	SET /A _colspan+=1
 	SET _op5_result=NA
 	SET _result=NA
-	ECHO         ^<td width="100"^>^<div align="center"^>OP5^<br^>cleaned^</div^>^</td^> >>!_legend!
+	ECHO         ^<td width="100"^>^<div align="center"^>OP5^<br^>Cleaned^</div^>^</td^> >>!_legend!
 
 	IF !_mode!==up (
 		IF EXIST "\\!_computer!\c$\*.*" (
@@ -471,7 +480,7 @@ IF !check_vnc!==yes (
 	SET /A _colspan+=1
 	SET _vnc_result=NA
 	SET _result=NA
-	ECHO         ^<td width="100"^>^<div align="center"^>VNC^<br^>cleaned^</div^>^</td^> >>!_legend!
+	ECHO         ^<td width="100"^>^<div align="center"^>VNC^<br^>Cleaned^</div^>^</td^> >>!_legend!
 	IF !_mode!==up (
 		IF EXIST "\\!_computer!\c$\*.*" (
 		SET _vnc_result=OK
@@ -502,7 +511,7 @@ IF !check_dameware!==yes (
 	SET /A _colspan+=1
 	SET _dameware_result=NA
 	SET _result=NA
-	ECHO         ^<td width="100"^>^<div align="center"^>Dameware^<br^>cleaned^</div^>^</td^> >>!_legend!
+	ECHO         ^<td width="100"^>^<div align="center"^>Dameware^<br^>Cleaned^</div^>^</td^> >>!_legend!
 		IF !_mode!==up (
 		IF EXIST "\\!_computer!\c$\*.*" (
 		SET _dameware_result=OK
@@ -530,7 +539,7 @@ IF !check_NSClient!==yes (
 	SET /A _colspan+=1
 	SET _NSClient_result=NA
 	SET _result=NA
-	ECHO         ^<td width="100"^>^<div align="center"^>NSClient^<br^>cleaned^</div^>^</td^> >>!_legend!
+	ECHO         ^<td width="100"^>^<div align="center"^>NSClient^<br^>Cleaned^</div^>^</td^> >>!_legend!
 	IF !_mode!==up (
 		IF EXIST "\\!_computer!\c$\*.*" (
 			SET _NSClient_result=OK
@@ -612,6 +621,33 @@ IF !check_Webroot!==yes (
 	ECHO.
 )
 
+:: check_powershell ; Values yes/no
+FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_powershell" "settings.cfg"') DO IF %%A==0 (ECHO check_powershell^=no>>settings.cfg)
+FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_powershell" "settings.cfg"') DO (SET check_powershell=%%A)
+IF !check_powershell!==yes (
+	SET _separator=***** HP ***********************************************************
+	ECHO !_separator:~0,70!
+	SET /A _colspan+=1
+	SET _powershell_result=NA
+	SET _result=NA
+	ECHO         ^<td width="100"^>^<div align="center"^>Powershell^<br^>Exist^</div^>^</td^> >>!_legend!
+	IF !_mode!==up (
+		IF EXIST "\\!_computer!\c$\*.*" (
+			SET _powershell_result=NOK
+			IF EXIST "\\!_computer!\c$\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" SET _powershell_result=OK		
+		)
+	)
+	ECHO !_computer!>>"Files\!_powershell_result!.log"
+
+	IF "!_powershell_result!"=="OK" (SET _result=!_ok!)
+	IF "!_powershell_result!"=="NOK" (SET _result=!_nok!)
+	IF !_mode!==down (SET _result=NA)
+	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
+	ECHO !_powershell_result!
+	SET _separator=***** End ************************************************************
+	ECHO !_separator:~0,70!
+	ECHO.
+)
 
 
 
@@ -695,7 +731,10 @@ SET /A _colspan+=2
 SET _separator=***** Checking net on !_computer! ************************************************
 ECHO !_separator:~0,70!
 SET _network=Unknown
+ECHO        ^<td width="200"^>^<div align="center"^>IPadress^</div^>^</td^> >>%_legend%
+ECHO        ^<td width="200"^>^<div align="center"^>Network^</div^>^</td^> >>%_legend%
 SET _A=NA
+SET _B=NA
 SET _B=NA
 SET _C=NA
 SET _D=NA
@@ -711,37 +750,31 @@ IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 224 IF /I !_D! GEQ 0 SET _n
 IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 226 IF /I !_D! GEQ 0 SET _network=PAGO_226
 IF /I !_A! EQU 10 IF /I !_B! EQU 46 IF /I !_C! EQU 46 IF /I !_D! GEQ 0 SET _network=PAGO_46
 
+REM HQ ?
+IF /I !_A! EQU 10 IF /I !_B! EQU 46 IF /I !_C! EQU 33 IF /I !_D! GEQ 0 SET _network=PAIN_33
+IF /I !_A! EQU 10 IF /I !_B! EQU 46 IF /I !_C! EQU 40 IF /I !_D! GEQ 0 SET _network=PAIN_40_WIFI
+IF /I !_A! EQU 10 IF /I !_B! EQU 46 IF /I !_C! EQU 41 IF /I !_D! GEQ 0 SET _network=PAIN_41_WIFI
+
 REM Gent
 IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 230 IF /I !_D! GEQ 0 SET _network=PAGE_230
 IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 231 IF /I !_D! GEQ 0 SET _network=PAGE_231
 
 REM Simrishamn
 IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 218 IF /I !_D! GEQ 0 SET _network=PASI_218
+IF /I !_A! EQU 10 IF /I !_B! EQU 46 IF /I !_C! EQU 129 IF /I !_D! GEQ 0 SET _network=PASI_129?
 
 REM Raufoss
 IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 225 IF /I !_D! GEQ 0 SET _network=PARA_225
+IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 222 IF /I !_D! GEQ 0 SET _network=PARA_222
+
+
 
 REM Offline
 IF /I !_A! EQU NA IF /I !_B! EQU NA IF /I !_C! EQU NA IF /I !_D! GEQ NA SET _network=NA
 
-IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 115 IF /I !_D! GEQ 0 SET _network=Hässleholm PC
-IF /I !_A! EQU 172 IF /I !_B! EQU 23 IF /I !_C! EQU 1 IF /I !_D! GEQ 0 SET _network=Marieholm PC
-IF /I !_A! EQU 172 IF /I !_B! EQU 24 IF /I !_C! EQU 1 IF /I !_D! GEQ 0 SET _network=Almedal PC
-IF /I !_A! EQU 172 IF /I !_B! EQU 24 IF /I !_C! EQU 49 IF /I !_D! GEQ 0 SET _network=Webland Hosting PC
-IF /I !_A! EQU 172 IF /I !_B! EQU 24 IF /I !_C! EQU 231 IF /I !_D! GEQ 0 SET _network=VPN PC
-IF /I !_A! EQU 172 IF /I !_B! EQU 24 IF /I !_C! EQU 232 IF /I !_D! GEQ 0 SET _network=WIFI-guest PC
-IF /I !_A! EQU 10 IF /I !_B! EQU 230 IF /I !_C! EQU 100 IF /I !_D! GEQ 0 SET _network=Otterhällan Tele
-IF /I !_A! EQU 10 IF /I !_B! EQU 230 IF /I !_C! EQU 103 IF /I !_D! GEQ 0 SET _network=Landskrona Tele
-IF /I !_A! EQU 10 IF /I !_B! EQU 230 IF /I !_C! EQU 105 IF /I !_D! GEQ 0 SET _network=Malmö Tele
-IF /I !_A! EQU 10 IF /I !_B! EQU 230 IF /I !_C! EQU 106 IF /I !_D! GEQ 0 SET _network=Stockholm Tele
-IF /I !_A! EQU 10 IF /I !_B! EQU 230 IF /I !_C! EQU 107 IF /I !_D! GEQ 0 SET _network=Marieholm Tele
-IF /I !_A! EQU 10 IF /I !_B! EQU 230 IF /I !_C! EQU 108 IF /I !_D! GEQ 0 SET _network=Högsbo BC Tele
-IF /I !_A! EQU 10 IF /I !_B! EQU 230 IF /I !_C! EQU 109 IF /I !_D! GEQ 0 SET _network=Almedal Tele
-
 ECHO Network=!_network!
 ECHO !_computer!	!_A!.!_B!.!_C!.!_D!>>"Files\!_network!.log"
-IF !_check_net! == yes ECHO        ^<td width="200"^> IPadress ^</td^> >>%_legend%
-IF !_check_net! == yes ECHO        ^<td width="200"^> Network ^</td^> >>%_legend%
+
 IF !_check_net! == yes ECHO        ^<td width="200"^> !_A!.!_B!.!_C!.!_D! ^</td^> >>%_table%
 IF !_check_net! == yes IF EXIST "Files\!_network!.log" (ECHO         ^<td width="200"^>^<a href="Files\!_network!.log"^> !_network!^</a^>^</td^> >>%_table%) ELSE (ECHO         ^<td width="200"^> !_network! ^</td^> >>%_table%)
 ECHO.
@@ -839,6 +872,9 @@ ECHO         ^<td colspan="!_colspan!"^>^<div align="center"^>Online=!_count_onl
 ECHO        ^</tr^>>>!_endname!
 ECHO        ^<tr bgcolor="#ffffff"^>>>!_endname!
 ECHO         ^<td colspan="!_colspan!"^>^<div align="center"^>Todo? Please mail me suggestions ^</div^>^</td^>>>!_endname!
+ECHO        ^</tr^>>>!_endname!
+ECHO        ^<tr bgcolor="#ffffff"^>>>!_endname!
+ECHO         ^<td colspan="!_colspan!"^>^<div align="center"^>%~dp0%~nx0^</div^>^</td^>>>!_endname!
 ECHO        ^</tr^>>>!_endname!
 ECHO      ^</table^>>>!_endname!
 ECHO ^</body^>>>!_endname!
