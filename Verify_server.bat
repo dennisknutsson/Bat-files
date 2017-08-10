@@ -55,17 +55,17 @@ IF EXIST ..\SysinternalsSuite\pskill.exe (SET _pskill="..\SysinternalsSuite\pski
 IF NOT EXIST Files\*.* MD Files
 IF NOT EXIST "!_NEEDS_attentionfile!" ECHO.>!_NEEDS_attentionfile!
 
-REM Change to settings file
-REM SET _dnssuffix=plastal.net
+REM Getting DNS suffix
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "dnssuffix" "settings.cfg"') DO IF %%A==0 (ECHO dnssuffix^=change.me>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "dnssuffix" "settings.cfg"') DO (SET _dnssuffix=%%A)
 
 CLS
+REM Asks for remote computername
 IF X%1 NEQ X SET _computer=%1
 IF X%1 EQU X SET /p _computer=Computer ? 
 
-SET _header=Computername
-SET _result=!_computer!
+REM SET _header=Computername
+REM SET _result=!_computer!
 
 
 SET _separator=***** Count ***********************************************************
@@ -94,7 +94,7 @@ SET _header=!_header!,Mode
 SET _result=!_result! !_mode!
 ECHO         ^<td width="50"^>^<div align="center"^>Ping^</div^>^</td^> >>!_legend!
 IF !_mode!==up (ECHO         ^<td width="50"^>^<div align="center"^>!_on!^</div^>^</td^> >>!_table!) ELSE (ECHO         ^<td width="50"^>^<div align="center"^>!_off!^</div^>^</td^> >>!_table!) 
-SET _separator=***** End pinging !_computer! ************************************************************
+SET _separator=***** End pinging ***********************************************************************
 ECHO !_separator:~0,70!
 ECHO.
 
@@ -111,7 +111,7 @@ ECHO.
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_desc" "settings.cfg"') DO IF %%A==0 (ECHO check_desc^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_desc" "settings.cfg"') DO (SET _check_desc=%%A)
 IF !_check_desc!==yes (
-SET _separator=***** Desc ***********************************************************
+SET _separator=***** Check Desc ***********************************************************
 ECHO !_separator:~0,70!
 SET /A _colspan+=1
 SET _desc=NA
@@ -148,7 +148,7 @@ SET _Type=NA
 SET _PageFileLocation=NA
 IF !_check_systeminfo!==yes (
 SET /A _colspan+=6
-SET _separator=***** Checking systeminfo on !_computer! ******************************************************
+SET _separator=***** Check systeminfo on !_computer! ******************************************************
 ECHO !_separator:~0,70!
 ECHO.
 
@@ -234,10 +234,8 @@ IF !_show_systeminfo!==yes IF EXIST "Files\!_Model!.log" (ECHO         ^<td widt
 IF !_show_systeminfo!==yes IF EXIST "Files\!_Type!.log" (ECHO         ^<td width="50"^>^<a href="Files\!_Type!.log"^> !_Type!^</a^>^</td^> >>!_table!) ELSE (ECHO         ^<td width="50"^> !_Type! ^</td^> >>!_table!)
 IF !_show_systeminfo!==yes IF !_show_pagefile!==yes ECHO         ^<td width="130"^> !_PageFileLocation! ^</td^> >>!_table!
 
-
-
 ECHO.
-SET _separator=***** End checking systeminfo ver on !_computer! *******************************
+SET _separator=***** End ************************************************************************
 ECHO !_separator:~0,70!
 ECHO.
 )
@@ -249,21 +247,21 @@ ECHO.
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_ados" "settings.cfg"') DO IF %%A==0 (ECHO check_ados^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_ados" "settings.cfg"') DO (SET _check_ados=%%A)
 IF !_check_ados!==yes (
-SET _separator=***** AD OS ***********************************************************
-ECHO !_separator:~0,70!
-SET /A _colspan+=1
-SET _ados=NA
-FOR /F "tokens=1 delims=" %%A IN ('dsquery * -filter "(&(objectClass=Computer)(objectCategory=Computer)(sAMAccountName=!_computer!$))" -attr operatingSystem^|FIND /I /V "operatingSystem"') DO (SET _ados=%%A)
-REM ECHO ADos=!_ados!
-SET _ados=!_ados:  =!
-ECHO !_computer!>>"Files\!_ados!.log"
-ECHO         ^<td width="250"^> AD_os ^</td^> >>!_legend!
-ECHO         ^<td width="250"^> !_ados! ^</td^> >>!_table!
-ECHO !_ados!
-ECHO !_ados!>>"Files\OS.log"
-SET _separator=***** End ************************************************************
-ECHO !_separator:~0,70!
-ECHO.
+	SET _separator=***** Check AD OS ***********************************************************
+	ECHO !_separator:~0,70!
+	SET /A _colspan+=1
+	SET _ados=NA
+	FOR /F "tokens=1 delims=" %%A IN ('dsquery * -filter "(&(objectClass=Computer)(objectCategory=Computer)(sAMAccountName=!_computer!$))" -attr operatingSystem^|FIND /I /V "operatingSystem"') DO (SET _ados=%%A)
+	REM ECHO ADos=!_ados!
+	SET _ados=!_ados:  =!
+	ECHO !_computer!>>"Files\!_ados!.log"
+	ECHO         ^<td width="250"^> AD_os ^</td^> >>!_legend!
+	ECHO         ^<td width="250"^> !_ados! ^</td^> >>!_table!
+	ECHO !_ados!
+	ECHO !_ados!>>"Files\OS.log"
+	SET _separator=***** End ************************************************************
+	ECHO !_separator:~0,70!
+	ECHO.
 )
 
 ::run_ipconfig ; Values yes/no
@@ -299,7 +297,7 @@ FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "verify_clock" "settings.cfg"') 
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "verify_clock" "settings.cfg"') DO (SET _verify_clock=%%A)
 IF !_verify_clock!==yes (
 	SET /A _colspan+=1
-	SET _separator=***** Verify Clock on !_computer! *******************************
+	SET _separator=***** Verify Clock on !_computer! *********************************************
 	ECHO !_separator:~0,70!
 	SET _clocksource=NA
 	IF !_mode!==up (
@@ -315,7 +313,7 @@ IF !_verify_clock!==yes (
 	IF !_mode!==down ECHO        ^<td width="200"^> Clock ^</td^> >>!_legend!
 	IF !_mode!==down ECHO        ^<td width="200"^>^<div align="center"^> NA ^</div^>^</td^> >>%_table%
 	FOR /F %%A IN ("Files\clock_FILES\!_computer!_clock.txt") DO IF %%~zA EQU 0 DEL /Q "Files\clock_FILES\!_computer!_clock.txt"
-	SET _separator=***** End running ipconfig on !_computer! *******************************
+	SET _separator=***** End ***********************************************************************
 	ECHO !_separator:~0,70!
 )
 
@@ -324,7 +322,7 @@ IF !_verify_clock!==yes (
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_symantec" "settings.cfg"') DO IF %%A==0 (ECHO check_symantec^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_symantec" "settings.cfg"') DO (SET check_symantec=%%A)
 IF !check_symantec!==yes (
-	SET _separator=***** Symantec ***********************************************************
+	SET _separator=***** Check Symantec ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _symantec_result=NA
@@ -338,12 +336,9 @@ IF !check_symantec!==yes (
 			)
 		)
 	ECHO !_computer!>>"Files\!_symantec_result!.log"
-	REM ECHO "!_NEEDS_attentionfile!"
-	IF "!_symantec_result!"=="NOK" ECHO !_computer!>>"!_NEEDS_attentionfile!"
-	REM FOR /F "tokens=* delims=" %%A IN ('FIND /I /C "!_computer!" !_NEEDS_attentionfile!') DO (IF %%A==0 ECHO "A=0")
-	REM IF "!_symantec_result!"=="NOK" FOR /F "tokens=* delims=" %%A IN ('FIND /I /C "!_computer!" "!_NEEDS_attentionfile!"') DO (IF %%A==0 (ECHO !_computer!>>"!_NEEDS_attentionfile!"))
 	IF "!_symantec_result!"=="OK" (SET _result=!_ok!)
 	IF "!_symantec_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_symantec_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)	
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_symantec_result!
@@ -356,7 +351,7 @@ IF !check_symantec!==yes (
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_hp" "settings.cfg"') DO IF %%A==0 (ECHO check_hp^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_hp" "settings.cfg"') DO (SET check_hp=%%A)
 IF !check_hp!==yes (
-	SET _separator=***** HP ***********************************************************
+	SET _separator=***** Check HP ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _hp_result=NA
@@ -373,10 +368,11 @@ IF !check_hp!==yes (
 
 	IF "!_hp_result!"=="OK" (SET _result=!_ok!)
 	IF "!_hp_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_hp_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)	
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_hp_result!
-	SET _separator=***** End ************************************************************
+	SET _separator=***** End **************************************************************
 	ECHO !_separator:~0,70!
 	ECHO.
 )
@@ -385,7 +381,7 @@ IF !check_hp!==yes (
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_ibm" "settings.cfg"') DO IF %%A==0 (ECHO check_ibm^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_ibm" "settings.cfg"') DO (SET check_ibm=%%A)
 IF !check_ibm!==yes (
-SET _separator=***** Tivoli ***********************************************************
+SET _separator=***** Check IBM ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _ibm_result=NA
@@ -405,6 +401,7 @@ SET _separator=***** Tivoli ****************************************************
 	ECHO !_computer!>>"Files\!_ibm_result!.log"
 	IF "!_ibm_result!"=="OK" (SET _result=!_ok!)
 	IF "!_ibm_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_ibm_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)	
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_ibm_result!
@@ -418,7 +415,7 @@ SET _separator=***** Tivoli ****************************************************
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_tivoli" "settings.cfg"') DO IF %%A==0 (ECHO check_tivoli^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_tivoli" "settings.cfg"') DO (SET check_tivoli=%%A)
 IF !check_tivoli!==yes (
-SET _separator=***** Tivoli ***********************************************************
+SET _separator=***** Check Tivoli ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _tivoli_result=NA
@@ -433,6 +430,7 @@ SET _separator=***** Tivoli ****************************************************
 	ECHO !_computer!>>"Files\!_tivoli_result!.log"
 	IF "!_tivoli_result!"=="OK" (SET _result=!_ok!)
 	IF "!_tivoli_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_tivoli_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)	
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_tivoli_result!
@@ -446,7 +444,7 @@ SET _separator=***** Tivoli ****************************************************
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_op5" "settings.cfg"') DO IF %%A==0 (ECHO check_op5^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_op5" "settings.cfg"') DO (SET check_op5=%%A)
 IF !check_op5!==yes (
-	SET _separator=***** OP5 ***********************************************************
+	SET _separator=***** Check OP5 ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _op5_result=NA
@@ -463,6 +461,7 @@ IF !check_op5!==yes (
 	ECHO !_computer!>>"Files\!_op5_result!.log"
 	IF "!_op5_result!"=="OK" (SET _result=!_ok!)
 	IF "!_op5_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_op5_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)	
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_op5_result!
@@ -475,7 +474,7 @@ IF !check_op5!==yes (
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_vnc" "settings.cfg"') DO IF %%A==0 (ECHO check_vnc^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_vnc" "settings.cfg"') DO (SET check_vnc=%%A)
 IF !check_vnc!==yes (
-	SET _separator=***** VNC ***********************************************************
+	SET _separator=***** Check VNC ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _vnc_result=NA
@@ -491,6 +490,7 @@ IF !check_vnc!==yes (
 	ECHO !_computer!>>"Files\!_vnc_result!.log"
 	IF "!_vnc_result!"=="OK" (SET _result=!_ok!)
 	IF "!_vnc_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_vnc_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)	
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_vnc_result!
@@ -506,7 +506,7 @@ IF !check_vnc!==yes (
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_dameware" "settings.cfg"') DO IF %%A==0 (ECHO check_dameware^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_dameware" "settings.cfg"') DO (SET check_dameware=%%A)
 IF !check_dameware!==yes (
-	SET _separator=***** Dameware ***********************************************************
+	SET _separator=***** Check Dameware ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _dameware_result=NA
@@ -521,6 +521,7 @@ IF !check_dameware!==yes (
 	ECHO !_computer!>>"Files\!_dameware_result!.log"
 	IF "!_dameware_result!"=="OK" (SET _result=!_ok!)
 	IF "!_dameware_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_dameware_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)	
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_dameware_result!
@@ -534,7 +535,7 @@ IF !check_dameware!==yes (
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_NSClient" "settings.cfg"') DO IF %%A==0 (ECHO check_NSClient^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_NSClient" "settings.cfg"') DO (SET check_NSClient=%%A)
 IF !check_NSClient!==yes (
-	SET _separator=***** NSclient ***********************************************************
+	SET _separator=***** Check NSclient ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _NSClient_result=NA
@@ -545,6 +546,8 @@ IF !check_NSClient!==yes (
 			SET _NSClient_result=OK
 			IF EXIST "\\!_computer!\c$\Program Files (x86)\NSClient++\*.*" SET _NSClient_result=NOK
 			IF EXIST "\\!_computer!\c$\Program Files\NSClient++\*.*" SET _NSClient_result=NOK
+			IF EXIST "\\!_computer!\c$\Program Files (x86)\NSClient\*.*" SET _NSClient_result=NOK
+			IF EXIST "\\!_computer!\c$\Program Files\NSClient\*.*" SET _NSClient_result=NOK
 			)
 		)
 	ECHO !_computer!>>"Files\!_NSClient_result!.log"
@@ -552,6 +555,7 @@ IF !check_NSClient!==yes (
 	REM IF "!_NSClient_result!"=="NOK" FOR /F "tokens=* delims=" %%A IN ('FIND /I /C "!_computer!" !_NEEDS_attentionfile!') DO IF %%A==0 (ECHO !_computer!>>"!_NEEDS_attentionfile!")
 	IF "!_NSClient_result!"=="OK" (SET _result=!_ok!)
 	IF "!_NSClient_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_NSClient_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_NSClient_result!
@@ -565,7 +569,7 @@ IF !check_NSClient!==yes (
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_check_mk" "settings.cfg"') DO IF %%A==0 (ECHO check_check_mk^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_check_mk" "settings.cfg"') DO (SET check_check_mk=%%A)
 IF !check_check_mk!==yes (
-	SET _separator=***** Check_mk ***********************************************************
+	SET _separator=***** Check Check_mk ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _check_mk_result=NA
@@ -583,6 +587,7 @@ IF !check_check_mk!==yes (
 	REM IF "!_check_mk_result!"=="NOK" FOR /F "tokens=* delims=" %%A IN ('FIND /I /C "!_computer!" !_NEEDS_attentionfile!') DO IF %%A==0 (ECHO !_computer!>>"!_NEEDS_attentionfile!")
 	IF "!_check_mk_result!"=="OK" (SET _result=!_ok!)
 	IF "!_check_mk_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_check_mk_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_check_mk_result!
@@ -591,11 +596,12 @@ IF !check_check_mk!==yes (
 	ECHO.
 )
 
+
 :: check_Webroot ; Values yes/no
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_Webroot" "settings.cfg"') DO IF %%A==0 (ECHO check_Webroot^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_Webroot" "settings.cfg"') DO (SET check_Webroot=%%A)
 IF !check_Webroot!==yes (
-	SET _separator=***** Webroot ***********************************************************
+	SET _separator=***** Check Webroot ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _Webroot_result=NA
@@ -609,10 +615,9 @@ IF !check_Webroot!==yes (
 			)
 		)
 	ECHO !_computer!>>"Files\!_Webroot_result!.log"
-	IF "!_Webroot_result!"=="NOK" ECHO !_computer!>>"!_NEEDS_attentionfile!"
-	REM IF "!_Webroot_result!"=="NOK" FOR /F "tokens=* delims=" %%A IN ('FIND /I /C "!_computer!" !_NEEDS_attentionfile!') DO IF %%A==0 (ECHO !_computer!>>"!_NEEDS_attentionfile!)
 	IF "!_Webroot_result!"=="OK" (SET _result=!_ok!)
 	IF "!_Webroot_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_Webroot_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_Webroot_result!
@@ -621,11 +626,12 @@ IF !check_Webroot!==yes (
 	ECHO.
 )
 
+
 :: check_powershell ; Values yes/no
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_powershell" "settings.cfg"') DO IF %%A==0 (ECHO check_powershell^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_powershell" "settings.cfg"') DO (SET check_powershell=%%A)
 IF !check_powershell!==yes (
-	SET _separator=***** HP ***********************************************************
+	SET _separator=***** Check Powershell ***********************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _powershell_result=NA
@@ -634,13 +640,13 @@ IF !check_powershell!==yes (
 	IF !_mode!==up (
 		IF EXIST "\\!_computer!\c$\*.*" (
 			SET _powershell_result=NOK
-			IF EXIST "\\!_computer!\c$\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" SET _powershell_result=OK		
+			IF EXIST "\\!_computer!\c$\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" SET _powershell_result=OK
 		)
 	)
 	ECHO !_computer!>>"Files\!_powershell_result!.log"
-
 	IF "!_powershell_result!"=="OK" (SET _result=!_ok!)
 	IF "!_powershell_result!"=="NOK" (SET _result=!_nok!)
+	IF "!_powershell_result!"=="NOK" FOR /F "tokens=3 delims= " %%i in ('FIND /C /I "!_computer!" Files\NEEDS_attention.log') DO IF %%i NEQ 1 ( ECHO !_computer!>>Files\NEEDS_attention.log) ELSE (ECHO Duplicate!)
 	IF !_mode!==down (SET _result=NA)
 	ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	ECHO !_powershell_result!
@@ -656,7 +662,7 @@ IF !check_powershell!==yes (
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_dn" "settings.cfg"') DO IF %%A==0 (ECHO check_dn^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_dn" "settings.cfg"') DO (SET _check_dn=%%A)
 IF !_check_dn!==yes (
-SET _separator=***** Dn ***********************************************************
+SET _separator=***** Check Dn ***********************************************************
 ECHO !_separator:~0,70!
 SET /A _colspan+=1
 SET _dn=NA
@@ -673,7 +679,7 @@ ECHO.
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_profiles" "settings.cfg"') DO IF %%A==0 (ECHO check_profiles^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_profiles" "settings.cfg"') DO (SET _check_profiles=%%A)
 IF !_check_profiles!==yes ( 
-SET _separator=***** Checking profiles on !_computer! c$ *******************************
+SET _separator=***** Check profiles ***********************************************************
 ECHO !_separator:~0,70!
 SET /A _colspan+=1
 SET _profiles=NA
@@ -699,7 +705,7 @@ ECHO.
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_access" "settings.cfg"') DO IF %%A==0 (ECHO check_access^=no>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_access" "settings.cfg"') DO (SET _check_access=%%A)
 IF !_check_access! == yes (
-	SET _separator=***** Checking Access **************************************************
+	SET _separator=***** Check Access *******************************************************
 	ECHO !_separator:~0,70!
 	SET /A _colspan+=1
 	SET _access_result=NA
@@ -714,11 +720,12 @@ IF !_check_access! == yes (
 		)
 		IF "!_access_result!"=="OK" (SET _result=!_ok!)
 		IF "!_access_result!"=="NOK" (SET _result=!_nok!)
+		
 		IF !_mode!==down (SET _result=NA)
 		ECHO         ^<td width="100"^>^<div align="center"^>!_result!^</div^>^</td^> >>%_table%
 	SET _header=!_header!,Profiles
 	SET _result=!_result! !_profiles!
-	SET _separator=***** End  *********************************************************
+	SET _separator=***** End  **************************************************************
 	ECHO !_separator:~0,70!
 	ECHO.
 )
@@ -728,7 +735,7 @@ FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "check_net" "settings.cfg"') DO 
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "check_net" "settings.cfg"') DO (SET _check_net=%%A)
 IF !_check_net!==yes (
 SET /A _colspan+=2
-SET _separator=***** Checking net on !_computer! ************************************************
+SET _separator=***** Check net **************************************************************
 ECHO !_separator:~0,70!
 SET _network=Unknown
 ECHO        ^<td width="200"^>^<div align="center"^>IPadress^</div^>^</td^> >>%_legend%
@@ -767,8 +774,6 @@ REM Raufoss
 IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 225 IF /I !_D! GEQ 0 SET _network=PARA_225
 IF /I !_A! EQU 192 IF /I !_B! EQU 168 IF /I !_C! EQU 222 IF /I !_D! GEQ 0 SET _network=PARA_222
 
-
-
 REM Offline
 IF /I !_A! EQU NA IF /I !_B! EQU NA IF /I !_C! EQU NA IF /I !_D! GEQ NA SET _network=NA
 
@@ -778,9 +783,9 @@ ECHO !_computer!	!_A!.!_B!.!_C!.!_D!>>"Files\!_network!.log"
 IF !_check_net! == yes ECHO        ^<td width="200"^> !_A!.!_B!.!_C!.!_D! ^</td^> >>%_table%
 IF !_check_net! == yes IF EXIST "Files\!_network!.log" (ECHO         ^<td width="200"^>^<a href="Files\!_network!.log"^> !_network!^</a^>^</td^> >>%_table%) ELSE (ECHO         ^<td width="200"^> !_network! ^</td^> >>%_table%)
 ECHO.
-SET _header=!_header!,Network
+REM SET _header=!_header!,Network
 SET _result=!_result! !_network!
-SET _separator=***** End checking net on !_computer! ************************************************
+SET _separator=***** End ***************************************************************************
 ECHO !_separator:~0,70!
 ECHO.
 )
@@ -854,14 +859,14 @@ IF EXIST "Files\online.log" FOR /F "usebackq" %%i IN ("Files\online.log") DO (SE
 IF EXIST "Files\offline.log" FOR /F "usebackq" %%i IN ("Files\offline.log") DO (SET /A _count_offline+=1)
 
 REM Create End
-ECHO        ^<tr bgcolor="#ffffff"^> >>!_endname!
+ECHO        ^<tr bgcolor="#ffffff"^> >!_endname!
 IF NOT EXIST "Files\offline.log" ECHO         ^<td colspan="!_colspan!"^>^<div align="center"^>^<a href="Files\online.log"^>Online ^</a^>Computers %title% %_zon%^</div^>^</td^> >>!_endname!
 IF EXIST "Files\offline.log" ECHO         ^<td colspan="!_colspan!"^>^<div align="center"^>^<a href="Files\online.log"^>Online ^</a^>Computers %title% Filetime=%filetime% ^<a href="Files\offline.log"^> Offline^</a^>^</div^>^</td^> >>!_endname!
 ECHO        ^</tr^> >>!_endname!
 ECHO        ^<tr bgcolor="#ffffff"^> >>!_endname!
 ECHO         ^<td colspan="!_colspan!"^>Start !_starttime!^</td^> >>!_endname!
 ECHO        ^</tr^> >>!_endname!
-ECHO        ^<tr bgcolor="#ffffff"^> >!_endname!
+ECHO        ^<tr bgcolor="#ffffff"^> >>!_endname!
 ECHO         ^<td colspan="!_colspan!"^>Stop %date% %time%^</td^> >>!_endname!
 ECHO        ^</tr^> >>!_endname!
 ECHO        ^<tr bgcolor="#ffffff"^>>>!_endname!
@@ -885,8 +890,11 @@ ECHO ^</html^>>>!_endname!
 FOR /F "tokens=3 delims=: " %%A IN ('FIND /I /C "outputfilename" "settings.cfg"') DO IF %%A==0 (ECHO outputfilename^=index.html>>settings.cfg)
 FOR /F "tokens=2 delims=^=" %%A IN ('FIND /I "outputfilename" "settings.cfg"') DO (SET _outputfilename=%%A)
 COPY "Files\top.html" +"Files\legend.html" +"Files\table.html" +"Files\end.html" "!_outputfilename!" >NUL
-
-SET _separator=***** End script *************************************************************
+ECHO !_outputfilename!
+SET _separator=***** End ***************************************************************************
+ECHO !_separator:~0,70!
+ECHO.
+SET _separator=***** End of script *************************************************************
 ECHO !_separator:~0,70!
 
 )
